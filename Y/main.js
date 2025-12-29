@@ -1,78 +1,40 @@
-onload = () => {
-  // 1. ÇİÇEK ANİMASYONU
+// --- FIREBASE KÜTÜPHANELERİNİ İÇERİ AL ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+// --- AYARLAR (BURAYI KENDİ KODLARINLA DEĞİŞTİR) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBMM_yhDt2QUzkUJM0CM9HHT_VK0fap1lo",
+  authDomain: "mylove-b4bb2.firebaseapp.com",
+  databaseURL: "https://mylove-b4bb2-default-rtdb.firebaseio.com",
+  projectId: "mylove-b4bb2",
+  storageBucket: "mylove-b4bb2.firebasestorage.app",
+  messagingSenderId: "1009944408502",
+  appId: "1:1009944408502:web:78b0e4666b93086c2bd117",
+  measurementId: "G-PB3T4NGZHR"
+};
+
+// --- FIREBASE'İ BAŞLAT ---
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const notesRef = ref(db, 'notes'); // Veritabanındaki 'notes' klasörü
+
+// --- SAYFA YÜKLENİNCE ---
+window.onload = () => {
+  // 1. Çiçek Animasyonu
   const c = setTimeout(() => {
     document.body.classList.remove("not-loaded");
     clearTimeout(c);
   }, 1000);
 
-  // 2. SİSTEMLERİ BAŞLAT
+  // 2. Sistemleri Başlat
   initNotesSystem();
   initImageSystem();
 };
 
-// --- RESİM GALERİSİ SİSTEMİ ---
-function initImageSystem() {
-  const imgBtn = document.querySelectorAll('.glow-btn')[0]; // Birinci buton (RESİMLER)
-  const modal = document.getElementById('image-modal');
-  const closeBtn = document.getElementById('close-images');
-  const galleryContainer = document.getElementById('image-gallery-container');
-
-  // Resim Ayarları
-  const totalImages = 43; // Toplam resim sayısı
-  const imageFolder = 'images/'; // Klasör yolu
-  const imageName = 'foto'; // Resim isminin kökü (foto1, foto2...)
-  const imageExt = '.jpg'; // Uzantı (.jpg veya .png)
-
-  // Modalı Aç
-  if (imgBtn) {
-    imgBtn.addEventListener('click', () => {
-      modal.style.display = 'flex';
-      
-      // Eğer galeri boşsa resimleri yükle (tekrar tekrar yüklemesin)
-      if (galleryContainer.innerHTML.trim() === "") {
-        loadImages();
-      }
-    });
-  }
-
-  // Modalı Kapat
-  closeBtn.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
-
-  // Dışarı tıklayınca kapat
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.style.display = 'none';
-    }
-  });
-
-  // Resimleri Döngüyle Oluşturma Fonksiyonu
-  function loadImages() {
-    for (let i = 1; i <= totalImages; i++) {
-      const img = document.createElement('img');
-      img.src = `${imageFolder}${imageName}${i}${imageExt}`; // Örn: images/foto1.jpg
-      img.alt = `Fotoğraf ${i}`;
-      img.className = 'gallery-img';
-      
-      // Resim yüklenemezse (dosya yoksa) konsola hata basmasın, gizlesin
-      img.onerror = function() {
-        this.style.display = 'none';
-      };
-
-      // Resme tıklayınca yeni sekmede büyük halini açsın (İstersen kaldırabilirsin)
-      img.onclick = function() {
-        window.open(this.src, '_blank');
-      };
-
-      galleryContainer.appendChild(img);
-    }
-  }
-}
-
-// --- NOTLAR SİSTEMİ (Önceki Kod) ---
+// --- NOT SİSTEMİ (FIREBASE ENTEGRELİ) ---
 function initNotesSystem() {
-  const notesBtn = document.querySelectorAll('.glow-btn')[1]; 
+  const notesBtn = document.querySelectorAll('.glow-btn')[1];
   const modal = document.getElementById('note-modal');
   const closeBtn = document.getElementById('close-notes');
   const addBtn = document.getElementById('add-note-btn');
@@ -81,55 +43,109 @@ function initNotesSystem() {
 
   const noteColors = ['#ffeb3b', '#ffc107', '#8bc34a', '#03a9f4', '#e91e63', '#9c27b0', '#00bcd4'];
 
+  // Modalı Aç
   if (notesBtn) {
     notesBtn.addEventListener('click', () => {
       modal.style.display = 'flex';
-      loadNotes(); 
     });
   }
 
   closeBtn.addEventListener('click', () => modal.style.display = 'none');
   window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 
+  // Not Ekleme (Firebase'e Gönder)
   addBtn.addEventListener('click', () => {
     const text = input.value.trim();
     if (text) {
       const newNote = {
         text: text,
         color: noteColors[Math.floor(Math.random() * noteColors.length)],
-        rotate: Math.floor(Math.random() * 20) - 10 
+        rotate: Math.floor(Math.random() * 20) - 10,
+        date: Date.now() // Sıralama için tarih
       };
-      saveNoteToLocal(newNote);
+
+      push(notesRef, newNote); // VERİTABANINA YAZ
       input.value = '';
-      loadNotes();
     }
   });
 
   input.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
 
-  function saveNoteToLocal(noteObj) {
-    let notes = JSON.parse(localStorage.getItem('galleryNotes')) || [];
-    notes.push(noteObj);
-    localStorage.setItem('galleryNotes', JSON.stringify(notes));
-  }
+  // Notları Dinle (Firebase'den Veri Gelince Çalışır)
+  onValue(notesRef, (snapshot) => {
+    gallery.innerHTML = ''; // Önce temizle
+    const data = snapshot.val();
 
-  function loadNotes() {
-    gallery.innerHTML = ''; 
-    let notes = JSON.parse(localStorage.getItem('galleryNotes')) || [];
-    notes.slice().reverse().forEach((note, index) => {
-      const card = document.createElement('div');
-      card.className = 'note-card';
-      card.style.backgroundColor = note.color || '#ffeb3b';
-      card.style.transform = `rotate(${note.rotate || 0}deg)`;
-      card.innerHTML = `<p>${note.text}</p><span class="delete-note" onclick="deleteNote(${notes.length - 1 - index})">🗑️</span>`;
-      gallery.appendChild(card);
+    if (data) {
+      // Firebase objesini diziye çevir
+      const notesArray = Object.entries(data).map(([key, value]) => {
+        return { id: key, ...value };
+      });
+
+      // Ters çevir (Yeni en başta)
+      notesArray.reverse().forEach((note) => {
+        createNoteElement(note);
+      });
+    }
+  });
+
+  function createNoteElement(note) {
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.style.backgroundColor = note.color;
+    card.style.transform = `rotate(${note.rotate}deg)`;
+    
+    // Silme butonu (ID ile siler)
+    card.innerHTML = `
+      <p>${note.text}</p>
+      <span class="delete-note" id="${note.id}">🗑️</span>
+    `;
+    
+    gallery.appendChild(card);
+
+    // Silme İşlemi
+    const delBtn = card.querySelector('.delete-note');
+    delBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Karta tıklanmasını engelle
+        const exactLocationOfNote = ref(db, `notes/${note.id}`);
+        remove(exactLocationOfNote); // Veritabanından sil
+    });
+  }
+}
+
+// --- RESİM SİSTEMİ (AYNI KALDI) ---
+function initImageSystem() {
+  const imgBtn = document.querySelectorAll('.glow-btn')[0];
+  const modal = document.getElementById('image-modal');
+  const closeBtn = document.getElementById('close-images');
+  const galleryContainer = document.getElementById('image-gallery-container');
+
+  const totalImages = 22;
+  const imageFolder = 'images/';
+  const imageName = 'foto';
+  const imageExt = '.jpg';
+
+  if (imgBtn) {
+    imgBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      if (galleryContainer.innerHTML.trim() === "") {
+        loadImages();
+      }
     });
   }
 
-  window.deleteNote = (realIndex) => {
-    let notes = JSON.parse(localStorage.getItem('galleryNotes')) || [];
-    notes.splice(realIndex, 1);
-    localStorage.setItem('galleryNotes', JSON.stringify(notes));
-    loadNotes();
-  };
+  closeBtn.addEventListener('click', () => modal.style.display = 'none');
+  window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+  function loadImages() {
+    for (let i = 1; i <= totalImages; i++) {
+      const img = document.createElement('img');
+      img.src = `${imageFolder}${imageName}${i}${imageExt}`;
+      img.alt = `Fotoğraf ${i}`;
+      img.className = 'gallery-img';
+      img.onerror = function() { this.style.display = 'none'; };
+      img.onclick = function() { window.open(this.src, '_blank'); };
+      galleryContainer.appendChild(img);
+    }
+  }
 }
