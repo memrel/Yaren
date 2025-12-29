@@ -1213,4 +1213,252 @@ body {
   animation-play-state: paused !important;
 }
 
+.button-container {
+    position: absolute;
+    bottom: 15%; /* Sayfanın altından biraz yukarıda */
+    left: 50%;
+    transform: translateX(-50%); /* Tam ortalamak için */
+    display: flex;
+    gap: 20px; /* İki buton arasındaki boşluk */
+    z-index: 1000; /* Çiçeklerin üstünde dursun */
+    
+    /* Animasyonla sonradan gelmesi için */
+    opacity: 0; 
+    animation: butonGelis 2s ease forwards;
+    animation-delay: 5s; /* Çiçekler bittikten sonra gelmesi için bekleme süresi */
+}
+
+.glow-btn {
+    background: rgba(0, 0, 0, 0.3); /* Hafif şeffaf siyah */
+    color: #ffffff; /* Yazı rengi */
+    border: 1px solid rgba(255, 255, 255, 0.4); /* İnce beyaz çerçeve */
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border-radius: 30px; /* Yuvarlak kenarlar */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit; /* Sayfanın yazı tipiyle aynı olsun */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.glow-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); /* Parlama efekti */
+    transform: scale(1.05); /* Üzerine gelince hafif büyüsün */
+}
+
+/* Butonların yavaşça belirmesi animasyonu */
+@keyframes butonGelis {
+    to {
+        opacity: 1;
+    }
+}
+
+/* --- SERGİ MODU VE NOTLAR --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+
+.modal-content.gallery-mode {
+  background: rgba(30, 30, 30, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  width: 90%;
+  height: 90%; /* Ekranı kaplasın */
+  border-radius: 20px;
+  padding: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.gallery-title {
+  color: #fff;
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  text-shadow: 0 0 10px rgba(247, 77, 173, 0.8);
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px; right: 30px;
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Giriş Alanı */
+.input-area {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+#note-input {
+  padding: 15px;
+  width: 300px;
+  border-radius: 30px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  font-size: 1rem;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+#add-note-btn {
+  padding: 12px 25px;
+  border-radius: 30px;
+  border: none;
+  background: rgb(247, 77, 173);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#add-note-btn:hover {
+  background: rgb(212, 53, 143);
+  box-shadow: 0 0 15px rgb(247, 77, 173);
+}
+
+/* --- DUVAR (GRID) YAPISI --- */
+.gallery-grid {
+  flex: 1; /* Kalan boşluğu kapla */
+  overflow-y: auto; /* Kaydırma çubuğu */
+  display: flex;
+  flex-wrap: wrap; /* Sığmayan aşağı geçsin */
+  justify-content: center;
+  align-content: flex-start;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Not Kartı Tasarımı (Post-it Gibi) */
+.note-card {
+  width: 200px;
+  height: 200px;
+  background-color: #ffeb3b; /* Varsayılan sarı, JS ile değişecek */
+  padding: 20px;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease, z-index 0.3s;
+  cursor: default;
+  border-radius: 2px;
+}
+
+/* Karta "İğne" Efekti */
+.note-card::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle at 30% 30%, #ff5e5e, #990000);
+  border-radius: 50%;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Hover Efekti: Kart öne gelsin ve büyüsün */
+.note-card:hover {
+  transform: scale(1.1) rotate(0deg) !important; /* Dönmeyi sıfırla, düzelt */
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+}
+
+/* Silme Butonu (Çöp Kutusu) */
+.delete-note {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+  color: #d32f2f;
+  cursor: pointer;
+  opacity: 0; /* Başta gizli */
+  transition: opacity 0.3s;
+}
+
+.note-card:hover .delete-note {
+  opacity: 1; /* Üzerine gelince görünsün */
+}
+
+/* --- RESİM GALERİSİ STİLLERİ --- */
+
+/* Izgara Yapısı: Sığdığı kadar yan yana koy */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 10px;
+  width: 100%;
+  overflow-y: auto; /* Çok resim olunca kaydırma çubuğu çıksın */
+}
+
+/* Resim Kartları */
+.gallery-img {
+  width: 100%;
+  height: 150px; /* Hepsi aynı boyda görünsün */
+  object-fit: cover; /* Resmi sündürmeden kırp */
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+/* Hover Efekti: Resim büyüsün ve parlasın */
+.gallery-img:hover {
+  transform: scale(1.15); /* Biraz büyüt */
+  z-index: 10; /* Diğerlerinin önüne geç */
+  border-color: rgb(247, 77, 173); /* Çerçeve pembe olsun */
+  box-shadow: 0 0 20px rgba(247, 77, 173, 0.6);
+}
+/* --- ÖZEL KAYDIRMA ÇUBUĞU (SCROLLBAR) --- */
+
+/* 1. Çubuğun Genişliği */
+::-webkit-scrollbar {
+    width: 10px; /* İnce ve zarif olsun */
+}
+
+/* 2. Çubuğun Arka Plan Yolu (Track) */
+::-webkit-scrollbar-track {
+    background: #111; /* Koyu gri/siyah arka plan */
+    border-radius: 5px;
+}
+
+/* 3. Çubuğun Kendisi (Thumb - Hareket Eden Kısım) */
+::-webkit-scrollbar-thumb {
+    background: #444; /* Normalde koyu gri dursun, göz almasın */
+    border-radius: 5px; /* Yuvarlak hatlar */
+    border: 2px solid #111; /* Etrafına ince bir boşluk bırakır */
+}
+
+/* 4. Üzerine Gelince (Hover) */
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(247, 77, 173); /* Üzerine gelince senin PEMBE rengin olsun */
+    box-shadow: 0 0 10px rgb(247, 77, 173); /* Ve hafifçe parlasın */
+}
 /*# sourceMappingURL=style.css.map */
