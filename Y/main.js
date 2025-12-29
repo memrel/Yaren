@@ -120,7 +120,7 @@ function initImageSystem() {
   const closeBtn = document.getElementById('close-images');
   const galleryContainer = document.getElementById('image-gallery-container');
 
-  const totalImages = 22;
+  const totalImages = 42;
   const imageFolder = 'images/';
   const imageName = 'foto';
   const imageExt = '.jpg';
