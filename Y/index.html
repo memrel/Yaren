@@ -9,13 +9,12 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Document Title -->
-  <title>myLove</title>
+  <title>FLOWERS</title>
 </head>
 
 <body class="not-loaded">
   <!-- Background -->
   <div class="night"></div>
-
   <!-- Flower -->
   <div class="flowers">
     <div class="flower flower--1">
@@ -314,11 +313,37 @@
     </div>
   </div>
 
-  <!-- Title -->
-  <h1 class="title"><span id="title"></span></h1>
+  <div class="button-container">
+      <button class="glow-btn">RESİMLER</button>
+      <button class="glow-btn">NOTLAR</button>
+  </div>
+  <div id="note-modal" class="modal-overlay">
+  <div class="modal-content gallery-mode">
+    <span class="close-btn" id="close-notes">&times;</span>
+    <h2 class="gallery-title">🌹 Anı Duvarı</h2>
+    
+    <div class="input-area">
+      <input type="text" id="note-input" placeholder="Bir not bırak..." autocomplete="off">
+      <button id="add-note-btn">Duvara As 📌</button>
+    </div>
+
+    <div id="notes-gallery" class="gallery-grid">
+      </div>
+  </div>
+</div>
+<div id="image-modal" class="modal-overlay">
+  <div class="modal-content gallery-mode">
+    <span class="close-btn" id="close-images">&times;</span>
+    <h2 class="gallery-title">📸 Fotoğraf Albümü</h2>
+    
+    <div id="image-gallery-container" class="photo-grid">
+      </div>
+  </div>
+</div>
 </body>
 
 </html>
+
 
 <!-- Import Javascript -->
 <script src="main.js"></script>
